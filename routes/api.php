@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Route;
  */
 Route::get('authors', 'Api\UserController@index');
 Route::get('authors/{id}', 'Api\UserController@show');
+Route::get('posts/authors/{id}', 'Api\UserController@posts');
+Route::get('comments/authors/{id}', 'Api\UserController@comments');
 
 
 
