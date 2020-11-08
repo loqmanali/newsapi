@@ -8,6 +8,8 @@ use App\Post;
 use App\Http\Resources\PostsResource;
 use App\Http\Resources\PostResource;
 use App\Http\Resources\CommentsResource;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class PostController extends Controller
 {
@@ -30,7 +32,44 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required',
+            'content'   => 'required',
+            'category_id'   => 'required'
+        ]);
+
+        $user = $request->user();
+
+        $post = new Post();
+
+        $post->title = $request->get( 'title' );
+        $post->content = $request->get( 'content' );
+        if( intval( $request->get( 'category_id' ) ) != 0 ){
+            $post->category_id = intval( $request->get( 'category_id' ) );
+        }
+        $post->user_id = $user->id;
+
+        $post->votes_up = 0;
+        $post->votes_down = 0;
+
+        $post->date_written = Carbon::now()->format('Y-m-d H:i:s');
+
+
+        // TODO: Handle 404 error
+        if( $request->hasFile('featured_image') ){
+            $featuredImage = $request->file( 'featured_image' );
+            $filename = time().$featuredImage->getClientOriginalName();
+            Storage::disk('images')->putFileAs(
+                $filename,
+                $featuredImage,
+                $filename
+            );
+            $post->featured_image = url('/') . '/images/' .$filename;
+        }
+
+        $post->save();
+
+        return new PostResource( $post );
     }
 
     /**
