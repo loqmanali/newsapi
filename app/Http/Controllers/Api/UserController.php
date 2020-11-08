@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\TokenResource;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-
 class UserController extends Controller
 {
     /**
@@ -95,14 +94,14 @@ class UserController extends Controller
         }
 
         if( $request->hasFile('avatar') ){
-            $user-> avatar = $request->get( 'avatar' );
-            // $filename = time().$featuredImage->getClientOriginalName();
-            // Storage::disk('images')->putFileAs(
-            //     $filename,
-            //     $featuredImage,
-            //     $filename
-            // );
-            // $user->avatar = url('/') . '/images/' .$filename;
+            $featuredImage = $request->file( 'avatar' );
+            $filename = time().$featuredImage->getClientOriginalName();
+            Storage::disk('images')->putFileAs(
+                $filename,
+                $featuredImage,
+                $filename
+            );
+            $user->avatar = url('/') . '/images/' .$filename;
         }
 
         $user->save();

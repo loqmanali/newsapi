@@ -93,7 +93,37 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $user = $request->user();
+        $post = Post::find( $id );
+
+        if( $request->has('title') ){
+            $post->title = $request->get( 'title' );
+        }
+
+        if( $request->has( 'content' ) ){
+            $post->content = $request->get( 'content' );
+        }
+
+        if( $request->has('category_id') ){
+            if( intval( $request->get( 'category_id' ) ) != 0 ){
+                $post->category_id = intval( $request->get( 'category_id' ) );
+            }
+        }
+        // TODO: Handle 404 error
+        if( $request->hasFile('featured_image') ){
+            $featuredImage = $request->file( 'featured_image' );
+            $filename = time().$featuredImage->getClientOriginalName();
+            Storage::disk('images')->putFileAs(
+                $filename,
+                $featuredImage,
+                $filename
+            );
+            $post->featured_image = url('/') . '/images/' .$filename;
+        }
+
+        $post->save();
+
+        return new PostResource( $post );
     }
 
     /**
