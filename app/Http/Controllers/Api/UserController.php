@@ -9,6 +9,9 @@ use App\Http\Resources\UsersResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\AuthorPostsResource;
 use App\Http\Resources\AuthorCommentsResource;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\TokenResource;
+
 class UserController extends Controller
 {
     /**
@@ -86,5 +89,18 @@ class UserController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function getToken( Request $request ){
+        $request->validate( [
+            'email' => 'required',
+            'password'  => 'required'
+        ] );
+        $credentials = $request->only( 'email' , 'password' );
+        if( Auth::attempt( $credentials ) ){
+            $user = User::where( 'email' , $request->get( 'email' ) )->first();
+            return new TokenResource( [ 'token' => $user->api_token] );
+        }
+        return 'not found';
     }
 }
