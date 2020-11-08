@@ -14,8 +14,11 @@ class UserObserver
      */
     public function created(User $user)
     {
-        $user->api_token = bin2hex( openssl_random_pseudo_bytes( 30 ) );
 
+    }
+
+    public function creating( User $user ){
+        $user->api_token = bin2hex( openssl_random_pseudo_bytes( 30 ) );
     }
 
     /**
